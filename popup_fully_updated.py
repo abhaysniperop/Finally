@@ -44,11 +44,11 @@ def keep_alive():
 # --- End Flask Keep Alive ---
 
 # --- Configuration ---
-TOKEN = '8024017834:AAGzAH4XdGtBwncYC8bjurycrh3EifGVVZY' # Replace with your actual token
+TOKEN = '8024017834:AAFObSdETIqU8Qu6e2gp8rlUda4uEX_4niw' # Replace with your actual token
 OWNER_ID = 7666198278 # Replace with your Owner ID
 ADMIN_ID = 7666198278 # Replace with your Admin ID (can be same as Owner)
 YOUR_USERNAME = '@SniperX_007' # Replace with your Telegram username (without the @)
-UPDATE_CHANNEL = 't.me/stripedrop' # Replace with your update channel link
+UPDATE_CHANNEL = 't.me/darksniperxd' # Replace with your update channel link
 
 # Folder setup - using absolute paths
 BASE_DIR = os.path.abspath(os.path.dirname(__file__)) # Get script's directory
@@ -57,7 +57,7 @@ IROTECH_DIR = os.path.join(BASE_DIR, 'inf') # Assuming this name is intentional
 DATABASE_PATH = os.path.join(IROTECH_DIR, 'bot_data.db')
 
 # File upload limits
-FREE_USER_LIMIT = 1
+FREE_USER_LIMIT = 2
 SUBSCRIBED_USER_LIMIT = 15 # Changed from 10 to 15
 ADMIN_LIMIT = 999       # Changed from 50 to 999
 OWNER_LIMIT = float('inf') # Changed from 999 to infinity
@@ -103,16 +103,6 @@ ADMIN_COMMAND_BUTTONS_LAYOUT_USER_SPEC = [
 
 # --- Database Setup ---
 def init_db():
-    # Create banned_users table
-    try:
-        conn = sqlite3.connect(DATABASE_PATH, check_same_thread=False)
-        c = conn.cursor()
-        c.execute('''CREATE TABLE IF NOT EXISTS banned_users (user_id INTEGER PRIMARY KEY)''')
-        conn.commit()
-        conn.close()
-    except Exception as e:
-        logger.error(f"❌ Error initializing banned_users table: {e}")
-
     """Initialize the database with required tables"""
     logger.info(f"Initializing database at: {DATABASE_PATH}")
     try:
@@ -171,31 +161,6 @@ def load_data():
         logger.info(f"Data loaded: {len(active_users)} users, {len(user_subscriptions)} subscriptions, {len(admin_ids)} admins.")
     except Exception as e:
         logger.error(f"❌ Error loading data: {e}", exc_info=True)
-
-
-# --- Ban System ---
-def is_user_banned(user_id):
-    conn = sqlite3.connect(DATABASE_PATH)
-    c = conn.cursor()
-    c.execute('SELECT 1 FROM banned_users WHERE user_id = ?', (user_id,))
-    result = c.fetchone()
-    conn.close()
-    return result is not None
-
-def ban_user(user_id):
-    conn = sqlite3.connect(DATABASE_PATH)
-    c = conn.cursor()
-    c.execute('INSERT OR IGNORE INTO banned_users (user_id) VALUES (?)', (user_id,))
-    conn.commit()
-    conn.close()
-
-def unban_user(user_id):
-    conn = sqlite3.connect(DATABASE_PATH)
-    c = conn.cursor()
-    c.execute('DELETE FROM banned_users WHERE user_id = ?', (user_id,))
-    conn.commit()
-    conn.close()
-# --- End Ban System ---
 
 # Initialize DB and Load Data at startup
 init_db()
@@ -1302,40 +1267,8 @@ def _logic_run_all_scripts(message_or_call):
 
 
 # --- Command Handlers & Text Handlers for ReplyKeyboard ---
-
-@bot.message_handler(commands=['ban'])
-def ban_handler(message):
-    if message.from_user.id not in admin_ids:
-        bot.reply_to(message, "❌ You are not allowed to use this.")
-        return
-    try:
-        user_id = int(message.text.split()[1])
-        if user_id == OWNER_ID:
-            bot.reply_to(message, "⚠️ Cannot ban the owner.")
-            return
-        ban_user(user_id)
-        bot.reply_to(message, f"✅ User `{user_id}` has been banned.", parse_mode="Markdown")
-    except:
-        bot.reply_to(message, "⚠️ Usage: `/ban <user_id>`", parse_mode="Markdown")
-
-@bot.message_handler(commands=['unban'])
-def unban_handler(message):
-    if message.from_user.id not in admin_ids:
-        bot.reply_to(message, "❌ You are not allowed to use this.")
-        return
-    try:
-        user_id = int(message.text.split()[1])
-        unban_user(user_id)
-        bot.reply_to(message, f"✅ User `{user_id}` has been unbanned.", parse_mode="Markdown")
-    except:
-        bot.reply_to(message, "⚠️ Usage: `/unban <user_id>`", parse_mode="Markdown")
-
-
 @bot.message_handler(commands=['start', 'help'])
-def command_send_welcome(message):
-    if is_user_banned(message.from_user.id):
-        bot.reply_to(message, "❌ You are banned from using this bot.")
-        return _logic_send_welcome(message)
+def command_send_welcome(message): _logic_send_welcome(message)
 
 @bot.message_handler(commands=['status']) # Kept for direct command
 def command_show_status(message): _logic_statistics(message) # Changed to call _logic_statistics
