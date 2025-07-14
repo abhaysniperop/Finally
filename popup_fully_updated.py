@@ -57,11 +57,11 @@ IROTECH_DIR = os.path.join(BASE_DIR, 'inf') # Assuming this name is intentional
 DATABASE_PATH = os.path.join(IROTECH_DIR, 'bot_data.db')
 
 # File upload limits
-FREE_USER_LIMIT = 2
+FREE_USER_LIMIT = 5
 SUBSCRIBED_USER_LIMIT = 15 # Changed from 10 to 15
 ADMIN_LIMIT = 999       # Changed from 50 to 999
 OWNER_LIMIT = float('inf') # Changed from 999 to infinity
-# FREE_MODE_LIMIT = 1 # Removed as free_mode is removed
+# FREE_MODE_LIMIT = 5 # Removed as free_mode is removed
 
 # Create necessary directories
 os.makedirs(UPLOAD_BOTS_DIR, exist_ok=True)
